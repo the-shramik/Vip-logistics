@@ -122,13 +122,11 @@ public class LorryReceiptController {
      */
     @GetMapping("/check-memo-exists")
     public ResponseEntity<?> checkMemoExists(@RequestParam String memoNo){
-       Boolean isExists =lorryReceiptService.checkMemoExists(memoNo);
-
-       if(isExists){
-           return ResponseEntity.status(HttpStatus.OK).body(true);
-       }else{
-           return ResponseEntity.status(HttpStatus.OK).body(false);
-       }
+          try {
+              return ResponseEntity.status(HttpStatus.OK).body(lorryReceiptService.checkMemoExists(memoNo));
+          }catch (Exception e){
+              return ResponseEntity.ok(0);
+          }
     }
 
     /**

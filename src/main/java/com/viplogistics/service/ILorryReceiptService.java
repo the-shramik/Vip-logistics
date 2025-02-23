@@ -6,6 +6,7 @@ import com.viplogistics.entity.transaction.dto.ItemListDto;
 import com.viplogistics.entity.transaction.dto.MisReportDto;
 import com.viplogistics.entity.transaction.dto.RegisterDto;
 import com.viplogistics.entity.transaction.helper.Bill;
+import com.viplogistics.entity.transaction.helper.MemoDto;
 import com.viplogistics.exception.ResourceNotFoundException;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public interface ILorryReceiptService {
 
     LorryReceipt updateLorryStatus(Long lrId,Boolean status) throws ResourceNotFoundException;
 
-    Boolean checkMemoExists(String memoNo);
+    MemoDto checkMemoExists(String memoNo) throws ResourceNotFoundException;
 
     Map<String,String> getLastMemoNo();
 

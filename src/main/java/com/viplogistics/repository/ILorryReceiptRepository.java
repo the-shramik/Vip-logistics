@@ -43,6 +43,13 @@ public interface ILorryReceiptRepository extends JpaRepository<LorryReceipt,Long
                                                       @Param("startDate") String startDate,
                                                       @Param("endDate") String endDate);
 
-    @Query("SELECT lr FROM lorry_receipt_transaction lr WHERE lr.bill.billNo = :billNo AND lr.bill IS NOT NULL")
-    List<LorryReceipt> findByBillNo(@Param("billNo") String billNo);
+    @Query("SELECT lr FROM lorry_receipt_transaction lr " +
+            "WHERE lr.bill.billNo = :billNo " +
+            "AND lr.bill IS NOT NULL " +
+            "AND lr.memo.memoStatus = true " +
+            "AND lr.route.routeName = :routeName")
+    List<LorryReceipt> findByBillNoAndMemoStatusAndRouteName(@Param("billNo") String billNo,
+                                                             @Param("routeName") String routeName);
+
+
 }

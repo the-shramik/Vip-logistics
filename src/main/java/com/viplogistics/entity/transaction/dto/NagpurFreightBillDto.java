@@ -1,6 +1,5 @@
 package com.viplogistics.entity.transaction.dto;
 
-import com.viplogistics.entity.transaction.dto.helper.CommonFreightBillDataDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -38,7 +37,7 @@ public class NagpurFreightBillDto {
 
     private Double stCharges;
 
-    private Double billAmt;
+    private Double lrCharges;
 
     private Double cgst;
 

@@ -1,6 +1,5 @@
 package com.viplogistics.entity.transaction.dto;
 
-import com.viplogistics.entity.transaction.dto.helper.CommonFreightBillDataDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

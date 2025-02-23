@@ -13,8 +13,8 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "freight_bill_transaction")
-public class FreightBillReport {
+@Entity(name = "nagpur_bill_transaction")
+public class NagpurBillReport {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +32,7 @@ public class FreightBillReport {
 
     private String gstNo;
 
-    private String routeTo;
+    private String routeName;
 
     private String codeNo;
 
@@ -42,5 +42,5 @@ public class FreightBillReport {
 
     private String sac;
 
-
+    private Boolean isVerified;
 }

@@ -8,6 +8,7 @@ import com.viplogistics.entity.transaction.dto.RegisterDto;
 import com.viplogistics.entity.transaction.helper.Bill;
 import com.viplogistics.entity.transaction.helper.LorryReceiptItem;
 import com.viplogistics.entity.transaction.helper.Memo;
+import com.viplogistics.entity.transaction.helper.MemoDto;
 import com.viplogistics.exception.ResourceNotFoundException;
 import com.viplogistics.repository.IBillRepository;
 import com.viplogistics.repository.ILorryReceiptItemRepository;
@@ -178,10 +179,20 @@ public class LorryReceiptServiceImpl implements ILorryReceiptService {
     }
 
     @Override
-    public Boolean checkMemoExists(String memoNo) {
-        Optional<Memo> optionalMemo = memoRepository.findByMemoNo(memoNo);
+    public MemoDto checkMemoExists(String memoNo) throws ResourceNotFoundException {
+        Memo memo=memoRepository.findByMemoNo(memoNo)
+                .orElseThrow(()->new ResourceNotFoundException("Memo not exists!"));
 
-        return optionalMemo.isPresent();
+        LorryReceipt lorryReceipt=memo.getLorryReceipts().stream().findFirst().get();
+
+        MemoDto memoDto=new MemoDto();
+        memoDto.setMemoExists(memoDto.isMemoExists());
+        memoDto.setRemark(lorryReceipt.getRemark());
+        memoDto.setWhoPay(lorryReceipt.getWhoPay());
+        memoDto.setOctroiPay(lorryReceipt.getOctroiPay());
+        memoDto.setWhoItemList(lorryReceipt.getWhoItemList());
+        memoDto.setRefTruckNo(lorryReceipt.getRefTruckNo());
+        return memoDto;
     }
 
     @Override

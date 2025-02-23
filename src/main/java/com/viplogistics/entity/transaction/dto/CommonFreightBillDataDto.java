@@ -1,4 +1,4 @@
-package com.viplogistics.entity.transaction.dto.helper;
+package com.viplogistics.entity.transaction.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,7 +19,8 @@ public class CommonFreightBillDataDto {
 
     private String gstNo;
 
-    private String to;
+    private String billNo;
 
-    private String code;
+    private String billDate;
+
 }
