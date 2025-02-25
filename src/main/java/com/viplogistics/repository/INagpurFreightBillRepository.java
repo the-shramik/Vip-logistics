@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface INagpurFreightBillRepository extends JpaRepository<NagpurBillReport,Long> {
+    Boolean existsByBillNo(String billNo);
 }

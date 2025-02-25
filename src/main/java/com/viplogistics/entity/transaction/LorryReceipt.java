@@ -37,6 +37,7 @@ public class LorryReceipt {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long lrId;
 
+    @Column(unique = true)
     private String lrNo;
 
     @ManyToOne

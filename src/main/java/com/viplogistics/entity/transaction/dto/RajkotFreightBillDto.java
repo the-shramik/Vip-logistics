@@ -35,13 +35,6 @@ public class RajkotFreightBillDto {
 
     private Double totalFreight;
 
-    private Double loadingCharges;
-
-    private Double unloadingCharges;
-
-    private Double plyWoodCharges;
-
-    private Double detentionCharges;
 
     private Double stCharges;
 
@@ -50,6 +43,8 @@ public class RajkotFreightBillDto {
     private Double igst;
 
     private Double totalBillValue;
+
+    private Double grandTotal;
 
     private CommonFreightBillDataDto commonFreightBillDataDto;
 }

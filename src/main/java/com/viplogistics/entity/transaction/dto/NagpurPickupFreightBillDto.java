@@ -29,12 +29,6 @@ public class NagpurPickupFreightBillDto {
 
     private Double totalFreight;
 
-    private Double loadingCharges;
-
-    private Double plyWoodCharges;
-
-    private Double collectionCharges;
-
     private Double stCharges;
 
     private Double cgst;
@@ -42,6 +36,8 @@ public class NagpurPickupFreightBillDto {
     private Double sgst;
 
     private Double totalBillValue;
+
+    private Double grandTotal;
 
     private CommonFreightBillDataDto commonFreightBillDataDto;
 }

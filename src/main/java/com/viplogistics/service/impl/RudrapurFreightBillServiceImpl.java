@@ -2,11 +2,12 @@ package com.viplogistics.service.impl;
 
 import com.viplogistics.entity.ApiResponse;
 import com.viplogistics.entity.transaction.LorryReceipt;
-import com.viplogistics.entity.transaction.RajkotBillReport;
 import com.viplogistics.entity.transaction.RudrapurBillReport;
 import com.viplogistics.entity.transaction.dto.CommonFreightBillDataDto;
 import com.viplogistics.entity.transaction.dto.RudrapurFreightBillDto;
 import com.viplogistics.entity.transaction.dto.helper.RudrapurFreightBillDtoHelper;
+import com.viplogistics.entity.transaction.dto.helper.response.RudrapurFreightBillResponseDto;
+import com.viplogistics.exception.BillAlreadySavedException;
 import com.viplogistics.exception.ResourceNotFoundException;
 import com.viplogistics.repository.ILorryReceiptRepository;
 import com.viplogistics.repository.IRudrapurFreightBillRepository;
@@ -30,10 +31,14 @@ public class RudrapurFreightBillServiceImpl implements IRudrapurFreightBillServi
     @Override
     public RudrapurFreightBillDtoHelper getRudrapurFreightBill(String billNo,String routeName) throws ResourceNotFoundException {
         try{
-            List<RudrapurFreightBillDto> rudrapurFreightBillDtos=new ArrayList<>();
+            List<RudrapurFreightBillResponseDto> rudrapurResponseFreightBillDtos = new ArrayList<>();
 
             lorryReceiptRepository.findByBillNoAndMemoStatusAndRouteName(billNo,routeName)
                     .forEach(lorryReceipt -> {
+
+                        RudrapurFreightBillResponseDto rudrapurFreightBillResponseDto=new RudrapurFreightBillResponseDto();
+                        List<RudrapurFreightBillDto> rudrapurFreightBillDtos=new ArrayList<>();
+
                         lorryReceipt.getLorryReceiptItems()
                                 .forEach(lorryReceiptItem -> {
                                     RudrapurFreightBillDto rudrapurFreightBillDto=new RudrapurFreightBillDto();
@@ -49,6 +54,7 @@ public class RudrapurFreightBillServiceImpl implements IRudrapurFreightBillServi
                                     rudrapurFreightBillDto.setSupplierName(null);
                                     rudrapurFreightBillDto.setWeight(lorryReceiptItem.getTotalWeight());
                                     rudrapurFreightBillDto.setTotalFreight(lorryReceiptItem.getTotalFreight());
+                                    rudrapurFreightBillDto.setGrandTotal(lorryReceipt.getGrandTotal());
 
                                     rudrapurFreightBillDto.setStCharges(lorryReceipt.getStCharges());
                                     rudrapurFreightBillDto.setTaxableAmt(null);
@@ -56,31 +62,29 @@ public class RudrapurFreightBillServiceImpl implements IRudrapurFreightBillServi
                                     rudrapurFreightBillDto.setRoundOff(null);
                                     rudrapurFreightBillDto.setTotalBillValue(null);
 
-                                    lorryReceipt.getExtraCharges()
-                                            .forEach(extraCharges -> {
-                                                if(extraCharges.getChargesHeads().equals("DETENTION_CHARGES")){
-                                                    rudrapurFreightBillDto.setDetentionCharges(extraCharges.getChargesAmount());
-                                                }else if(extraCharges.getChargesHeads().equals("LOADING_CHARGES")){
-                                                    rudrapurFreightBillDto.setLoadingCharges(extraCharges.getChargesAmount());
-                                                }else if(extraCharges.getChargesHeads().equals("LR_CHARGES")){
-                                                    rudrapurFreightBillDto.setLrCharges(extraCharges.getChargesAmount());
-                                                }
-                                                else {
-                                                    rudrapurFreightBillDto.setLoadingCharges(null);
-                                                    rudrapurFreightBillDto.setDetentionCharges(null);
-                                                    rudrapurFreightBillDto.setLrCharges(null);
-                                                }
-                                            });
-
                                     rudrapurFreightBillDtos.add(rudrapurFreightBillDto);
 
                                 });
+
+                        rudrapurFreightBillResponseDto.setRudrapurFreightBillDtos(rudrapurFreightBillDtos);
+                        lorryReceipt.getExtraCharges().forEach(extraCharges -> {
+                            if(extraCharges.getChargesHeads().equals("DETENTION_CHARGES")){
+                                rudrapurFreightBillResponseDto.setDetentionCharges(extraCharges.getChargesAmount());
+                            }else if(extraCharges.getChargesHeads().equals("LOADING_CHARGES")){
+                                rudrapurFreightBillResponseDto.setLoadingCharges(extraCharges.getChargesAmount());
+                            }else if(extraCharges.getChargesHeads().equals("LR_CHARGES")){
+                                rudrapurFreightBillResponseDto.setLrCharges(extraCharges.getChargesAmount());
+                            }
+                        });
+                        rudrapurResponseFreightBillDtos.add(rudrapurFreightBillResponseDto);
+
                     });
 
             RudrapurFreightBillDtoHelper rudrapurFreightBillDtoHelper=new RudrapurFreightBillDtoHelper();
-            rudrapurFreightBillDtoHelper.setRudrapurFreightBillDtos(rudrapurFreightBillDtos);
+            rudrapurFreightBillDtoHelper.setRudrapurFreightBillResponseDtos(rudrapurResponseFreightBillDtos);
 
             LorryReceipt lorryReceipt=lorryReceiptRepository.findByBillNoAndMemoStatusAndRouteName(billNo,routeName).stream().findFirst().get();
+
             if(lorryReceipt.getWhoPay().equals("Consignor")){
                 CommonFreightBillDataDto commonFreightBillDataDto=new CommonFreightBillDataDto();
                 commonFreightBillDataDto.setPartyName(lorryReceipt.getConsignor().getPartyName());
@@ -113,8 +117,12 @@ public class RudrapurFreightBillServiceImpl implements IRudrapurFreightBillServi
     }
 
     @Override
-    public RudrapurBillReport saveRudrapurFreightBill(RudrapurBillReport rudrapurBillReport) {
-        return rudrapurFreightBillRepository.save(rudrapurBillReport);
+    public RudrapurBillReport saveRudrapurFreightBill(RudrapurBillReport rudrapurBillReport) throws BillAlreadySavedException {
+        if(!rudrapurFreightBillRepository.existsByBillNo(rudrapurBillReport.getBillNo())) {
+            return rudrapurFreightBillRepository.save(rudrapurBillReport);
+        }else{
+            throw new BillAlreadySavedException("Bill already saved");
+        }
     }
 
     @Override

@@ -14,4 +14,6 @@ public interface IMemoRepository extends JpaRepository<Memo,Long> {
 
     @Query("SELECT m.memoNo FROM memo_lorry_receipt m ORDER BY m.memoId DESC LIMIT 1")
     String findLastMemoNo();
+
+
 }

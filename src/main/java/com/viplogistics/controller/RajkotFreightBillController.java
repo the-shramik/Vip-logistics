@@ -4,6 +4,7 @@ import com.viplogistics.entity.ApiResponse;
 import com.viplogistics.entity.transaction.MumbaiBillReport;
 import com.viplogistics.entity.transaction.NagpurPickupBillReport;
 import com.viplogistics.entity.transaction.RajkotBillReport;
+import com.viplogistics.exception.BillAlreadySavedException;
 import com.viplogistics.service.IRajkotFreightBillService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,18 +17,19 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin("*")
 public class RajkotFreightBillController {
 
-    private IRajkotFreightBillService rajkotFreightBillService;
+    private final IRajkotFreightBillService rajkotFreightBillService;
     @GetMapping("/rajkot-freight")
     public ResponseEntity<?> getRajkotFreightBill(@RequestParam String billNo,@RequestParam String routeName){
         try {
             return ResponseEntity.status(HttpStatus.OK).body(rajkotFreightBillService.getRajkotFreightBill(billNo,routeName));
         }catch (Exception e){
+            System.out.println(e.getMessage());
             return ResponseEntity.ok(0);
         }
     }
 
     @PostMapping("/save-rajkot-freight-bill")
-    public ResponseEntity<?> saveRajkotFreightBill(@RequestBody RajkotBillReport rajkotBillReport){
+    public ResponseEntity<?> saveRajkotFreightBill(@RequestBody RajkotBillReport rajkotBillReport) throws BillAlreadySavedException {
         return ResponseEntity.status(HttpStatus.OK).body(rajkotFreightBillService.saveRajkotFreightBill(rajkotBillReport));
     }
 

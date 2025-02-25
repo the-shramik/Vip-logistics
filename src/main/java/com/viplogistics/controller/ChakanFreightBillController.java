@@ -3,6 +3,7 @@ package com.viplogistics.controller;
 import com.viplogistics.entity.ApiResponse;
 import com.viplogistics.entity.transaction.ChakanBillReport;
 import com.viplogistics.entity.transaction.MumbaiBillReport;
+import com.viplogistics.exception.BillAlreadySavedException;
 import com.viplogistics.service.IChakanFreightBillService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,7 @@ public class ChakanFreightBillController {
     }
 
     @PostMapping("/save-chakan-freight-bill")
-    public ResponseEntity<?> saveChakanFreightBill(@RequestBody ChakanBillReport chakanBillReport){
+    public ResponseEntity<?> saveChakanFreightBill(@RequestBody ChakanBillReport chakanBillReport) throws BillAlreadySavedException {
         return ResponseEntity.status(HttpStatus.OK).body(chakanFreightBillService.saveChakanFreightBill(chakanBillReport));
     }
 

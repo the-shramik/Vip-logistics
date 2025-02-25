@@ -35,15 +35,13 @@ public class ChakanFreightBillDto {
 
     private Double totalFreight;
 
-    private Double unloadingCharges;
-
     private Double cgst;
 
     private Double sgst;
 
-    private Double lrCharges;
-
     private Double totalBillValue;
+
+    private Double grandTotal;
 
     private CommonFreightBillDataDto commonFreightBillDataDto;
 

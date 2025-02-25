@@ -1,8 +1,7 @@
 package com.viplogistics.entity.transaction.dto.helper;
 
 import com.viplogistics.entity.transaction.dto.CommonFreightBillDataDto;
-import com.viplogistics.entity.transaction.dto.NagpurFreightBillDto;
-import com.viplogistics.entity.transaction.dto.NagpurPickupFreightBillDto;
+import com.viplogistics.entity.transaction.dto.helper.response.NagpurPickupFreightBillResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +13,7 @@ import java.util.List;
 @Data
 public class NagpurPickupFreightBillDtoHelper {
 
-    private List<NagpurPickupFreightBillDto> nagpurPickupFreightBillDtos;
+    private List<NagpurPickupFreightBillResponseDto> nagpurPickupFreightBillResponseDtos;
 
     private CommonFreightBillDataDto commonFreightBillDataDto;
 }

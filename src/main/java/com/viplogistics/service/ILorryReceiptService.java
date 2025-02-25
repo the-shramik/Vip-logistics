@@ -7,6 +7,7 @@ import com.viplogistics.entity.transaction.dto.MisReportDto;
 import com.viplogistics.entity.transaction.dto.RegisterDto;
 import com.viplogistics.entity.transaction.helper.Bill;
 import com.viplogistics.entity.transaction.helper.MemoDto;
+import com.viplogistics.exception.BillAlreadySavedException;
 import com.viplogistics.exception.ResourceNotFoundException;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public interface ILorryReceiptService {
 
     List<MisReportDto> getLrSummary(String startDate, String endDate);
 
-    ApiResponse<?> updateBillDetails(Bill bill,String lrNo,String lrDate);
+    ApiResponse<?> updateBillDetails(Bill bill,String lrNo,String lrDate) throws BillAlreadySavedException;
 
     LorryReceipt getLrByMemoNoLrNo(String lrNo,String memoNo) throws ResourceNotFoundException;
 
@@ -49,4 +50,6 @@ public interface ILorryReceiptService {
     ItemListDto getLorryReceiptItem(String chalanNo);
 
     Map<String,Long> getLrCount();
+
+    Boolean checkLrNoExists(String lrNo);
 }

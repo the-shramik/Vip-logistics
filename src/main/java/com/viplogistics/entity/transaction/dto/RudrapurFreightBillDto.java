@@ -31,13 +31,7 @@ public class RudrapurFreightBillDto {
 
     private Double totalFreight;
 
-    private Double loadingCharges;
-
-    private Double detentionCharges;
-
     private Double stCharges;
-
-    private Double lrCharges;
 
     private Double taxableAmt;
 
@@ -46,6 +40,8 @@ public class RudrapurFreightBillDto {
     private String roundOff;
 
     private Double totalBillValue;
+
+    private Double grandTotal;
 
     private CommonFreightBillDataDto commonFreightBillDataDto;
 

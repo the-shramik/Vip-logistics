@@ -3,6 +3,7 @@ package com.viplogistics.controller;
 import com.viplogistics.entity.ApiResponse;
 import com.viplogistics.entity.transaction.LorryReceipt;
 import com.viplogistics.entity.transaction.helper.Bill;
+import com.viplogistics.exception.BillAlreadySavedException;
 import com.viplogistics.exception.ResourceNotFoundException;
 import com.viplogistics.service.ILorryReceiptService;
 import lombok.RequiredArgsConstructor;
@@ -161,14 +162,18 @@ public class LorryReceiptController {
      */
     @PutMapping("/update-bill-details")
     public ResponseEntity<?> updateBillDetails(@RequestBody Bill bill,@RequestParam String lrNo,
-                                               @RequestParam String lrDate){
+                                               @RequestParam String lrDate) throws BillAlreadySavedException {
 
-        ApiResponse<?> response = lorryReceiptService.updateBillDetails(bill, lrNo, lrDate);
-        if(response.isSuccess()){
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        }else{
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
+       try {
+           ApiResponse<?> response = lorryReceiptService.updateBillDetails(bill, lrNo, lrDate);
+           if (response.isSuccess()) {
+               return ResponseEntity.status(HttpStatus.OK).body(response);
+           } else {
+               return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+           }
+       }catch (BillAlreadySavedException e){
+           return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(e.getMessage());
+       }
     }
 
     /**
@@ -289,5 +294,20 @@ public class LorryReceiptController {
     @GetMapping("/get-lr-count")
     public ResponseEntity<?> getLrCount(){
         return ResponseEntity.status(HttpStatus.OK).body(lorryReceiptService.getLrCount());
+    }
+
+    /**
+     * Checks if a LoryReceipt exists by its LR number.
+     *
+     * @param lrNo The LR number to check.
+     * @return {@link ResponseEntity} with true if the memo exists, false otherwise.
+     */
+    @GetMapping("/check-lr-no-exists")
+    public ResponseEntity<?> checkLrExists(@RequestParam String lrNo){
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(lorryReceiptService.checkLrNoExists(lrNo));
+        }catch (Exception e){
+            return ResponseEntity.ok(0);
+        }
     }
 }

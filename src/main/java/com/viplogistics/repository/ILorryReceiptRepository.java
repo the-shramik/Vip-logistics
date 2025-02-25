@@ -52,4 +52,8 @@ public interface ILorryReceiptRepository extends JpaRepository<LorryReceipt,Long
                                                              @Param("routeName") String routeName);
 
 
+    boolean existsByLrNo(String lrNo);
+
+    List<LorryReceipt> findByBill_BillNo(String billNo);
+
 }

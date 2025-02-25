@@ -29,21 +29,15 @@ public class NagpurFreightBillDto {
 
     private Double totalFreight;
 
-    private Double unloadingCharges;
-
-    private Double plyWoodCharges;
-
-    private Double collectionCharges;
-
     private Double stCharges;
-
-    private Double lrCharges;
 
     private Double cgst;
 
     private Double sgst;
 
     private Double totalBillValue;
+
+    private Double grandTotal;
 
     private CommonFreightBillDataDto commonFreightBillDataDto;
 }

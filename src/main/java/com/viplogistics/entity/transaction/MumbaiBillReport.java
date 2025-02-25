@@ -1,9 +1,6 @@
 package com.viplogistics.entity.transaction;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +17,7 @@ public class MumbaiBillReport {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long freightBillReportId;
 
+    @Column(unique = true)
     private String billNo;
 
     private String partyName;

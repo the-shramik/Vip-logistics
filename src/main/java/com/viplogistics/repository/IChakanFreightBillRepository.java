@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface IChakanFreightBillRepository extends JpaRepository<ChakanBillReport,Long> {
+
+    Boolean existsByBillNo(String billNo);
 }

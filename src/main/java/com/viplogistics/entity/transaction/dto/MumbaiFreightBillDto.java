@@ -33,14 +33,6 @@ public class MumbaiFreightBillDto {
 
     private Double totalFreight;
 
-    private Double loadingCharges;
-
-    private Double unloadingCharges;
-
-    private Double plyWoodCharges;
-
-    private Double detentionCharges;
-
     private Double stCharges;
 
     private Double subTotal;
@@ -50,6 +42,8 @@ public class MumbaiFreightBillDto {
     private Double sgst;
 
     private Double totalBillValue;
+
+    private Double grandTotal;
 
     private CommonFreightBillDataDto commonFreightBillDataDto;
 }

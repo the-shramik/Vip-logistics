@@ -9,6 +9,7 @@ import com.viplogistics.entity.transaction.helper.Bill;
 import com.viplogistics.entity.transaction.helper.LorryReceiptItem;
 import com.viplogistics.entity.transaction.helper.Memo;
 import com.viplogistics.entity.transaction.helper.MemoDto;
+import com.viplogistics.exception.BillAlreadySavedException;
 import com.viplogistics.exception.ResourceNotFoundException;
 import com.viplogistics.repository.IBillRepository;
 import com.viplogistics.repository.ILorryReceiptItemRepository;
@@ -152,6 +153,8 @@ public class LorryReceiptServiceImpl implements ILorryReceiptService {
             lorryReceipt.getLorryReceiptItems().clear();
             lorryReceipt.getExtraCharges().clear();
 
+
+
             lorryReceiptRepository.delete(lorryReceipt);
             return new ApiResponse<>(true,"Lorry Receipt Deleted",null, HttpStatus.OK);
         }else{
@@ -257,22 +260,29 @@ public class LorryReceiptServiceImpl implements ILorryReceiptService {
     }
 
     @Override
-    public ApiResponse<?> updateBillDetails(Bill bill, String lrNo, String lrDate) {
+    public ApiResponse<?> updateBillDetails(Bill bill, String lrNo, String lrDate) throws BillAlreadySavedException {
 
-        try {
+        Optional<LorryReceipt> optionalLr = lorryReceiptRepository.findByBill_BillNo(bill.getBillNo())
+                .stream().findFirst();
 
-            Bill savedBill = billRepository.save(bill);
-            lorryReceiptRepository.findByLrNoAndLrDate(lrNo, lrDate)
-                    .forEach(lorryReceipt -> {
+        if(optionalLr.isEmpty()) {
+            try {
 
-                        LorryReceipt existedLr = lorryReceiptRepository.findById(lorryReceipt.getLrId()).get();
-                        existedLr.setBill(savedBill);
-                        lorryReceiptRepository.save(existedLr);
-                    });
+                Bill savedBill = billRepository.save(bill);
+                lorryReceiptRepository.findByLrNoAndLrDate(lrNo, lrDate)
+                        .forEach(lorryReceipt -> {
 
-            return new ApiResponse<>(true,"Bill updated",null,HttpStatus.OK);
-        }catch (Exception e){
-            return new ApiResponse<>(false,"Bill not updated",null,HttpStatus.INTERNAL_SERVER_ERROR);
+                            LorryReceipt existedLr = lorryReceiptRepository.findById(lorryReceipt.getLrId()).get();
+                            existedLr.setBill(savedBill);
+                            lorryReceiptRepository.save(existedLr);
+                        });
+
+                return new ApiResponse<>(true, "Bill updated", null, HttpStatus.OK);
+            } catch (Exception e) {
+                return new ApiResponse<>(false, "Bill not updated", null, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }else {
+            throw new BillAlreadySavedException("Bill already assigned");
         }
     }
 
@@ -401,5 +411,10 @@ public class LorryReceiptServiceImpl implements ILorryReceiptService {
         HashMap<String,Long> result=new HashMap<>();
         result.put("totalLrs",lorryReceiptRepository.count());
         return result;
+    }
+
+    @Override
+    public Boolean checkLrNoExists(String lrNo) {
+        return lorryReceiptRepository.existsByLrNo(lrNo);
     }
 }

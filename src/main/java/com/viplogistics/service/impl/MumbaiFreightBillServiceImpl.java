@@ -1,13 +1,14 @@
 package com.viplogistics.service.impl;
 
 import com.viplogistics.entity.ApiResponse;
-import com.viplogistics.entity.transaction.ChakanBillReport;
 import com.viplogistics.entity.transaction.LorryReceipt;
 import com.viplogistics.entity.transaction.MumbaiBillReport;
 import com.viplogistics.entity.transaction.dto.CommonFreightBillDataDto;
 import com.viplogistics.entity.transaction.dto.MumbaiFreightBillDto;
 import com.viplogistics.entity.transaction.dto.helper.MumbaiFreightBillDtoHelper;
+import com.viplogistics.entity.transaction.dto.helper.response.MumbaiFreightBillResponseDto;
 import com.viplogistics.entity.transaction.helper.ExtraCharges;
+import com.viplogistics.exception.BillAlreadySavedException;
 import com.viplogistics.exception.ResourceNotFoundException;
 import com.viplogistics.repository.ILorryReceiptRepository;
 import com.viplogistics.repository.IMumbaiFreightBillRepository;
@@ -33,10 +34,14 @@ public class MumbaiFreightBillServiceImpl implements IMumbaiFreightBillService {
 
         try{
 
-            List<MumbaiFreightBillDto> mumbaiFreightBillDtos=new ArrayList<>();
+            List<MumbaiFreightBillResponseDto> mumbaiResponseFreightBillDtos = new ArrayList<>();
 
             lorryReceiptRepository.findByBillNoAndMemoStatusAndRouteName(billNo,routeName)
                     .forEach(lorryReceipt -> {
+
+                        MumbaiFreightBillResponseDto mumbaiFreightBillResponseDto=new MumbaiFreightBillResponseDto();
+
+                        List<MumbaiFreightBillDto> mumbaiFreightBillDtos=new ArrayList<>();
                         lorryReceipt.getLorryReceiptItems().forEach(lorryReceiptItem -> {
                             MumbaiFreightBillDto mumbaiFreightBillDto=new MumbaiFreightBillDto();
 
@@ -53,7 +58,7 @@ public class MumbaiFreightBillServiceImpl implements IMumbaiFreightBillService {
                             mumbaiFreightBillDto.setVehicleNo(lorryReceipt.getRefTruckNo());
                             mumbaiFreightBillDto.setRate(lorryReceiptItem.getLcvFtl());
                             mumbaiFreightBillDto.setTotalFreight(lorryReceiptItem.getTotalFreight());
-
+                            mumbaiFreightBillDto.setGrandTotal(lorryReceipt.getGrandTotal());
 
                             mumbaiFreightBillDto.setStCharges(lorryReceipt.getStCharges());
                             double totalExtraCharges = lorryReceipt.getExtraCharges().stream()
@@ -68,35 +73,31 @@ public class MumbaiFreightBillServiceImpl implements IMumbaiFreightBillService {
                             mumbaiFreightBillDto.setSgst(lorryReceiptItem.getSgst());
                             mumbaiFreightBillDto.setTotalBillValue(null);
 
-
-                            lorryReceipt.getExtraCharges()
-                                    .forEach(extraCharges -> {
-                                        if(extraCharges.getChargesHeads().equals("LOADING_CHARGES")){
-                                            mumbaiFreightBillDto.setLoadingCharges(extraCharges.getChargesAmount());
-                                        }else if(extraCharges.getChargesHeads().equals("UNLOADING_CHARGES")){
-                                            mumbaiFreightBillDto.setUnloadingCharges(extraCharges.getChargesAmount());
-                                        }else if(extraCharges.getChargesHeads().equals("PLYWOOD_CHARGES")){
-                                            mumbaiFreightBillDto.setPlyWoodCharges(extraCharges.getChargesAmount());
-                                        } else if (extraCharges.getChargesHeads().equals("DETENTION_CHARGES")) {
-                                            mumbaiFreightBillDto.setDetentionCharges(extraCharges.getChargesAmount());
-                                        }
-                                        else {
-                                            mumbaiFreightBillDto.setLoadingCharges(null);
-                                            mumbaiFreightBillDto.setUnloadingCharges(null);
-                                            mumbaiFreightBillDto.setPlyWoodCharges(null);
-                                            mumbaiFreightBillDto.setDetentionCharges(null);
-                                        }
-                                    });
                             mumbaiFreightBillDtos.add(mumbaiFreightBillDto);
                         });
 
+                        mumbaiFreightBillResponseDto.setMumbaiFreightBillDtos(mumbaiFreightBillDtos);
+                        lorryReceipt.getExtraCharges().
+                                forEach(extraCharges -> {
+                                    if(extraCharges.getChargesHeads().equals("LOADING_CHARGES")){
+                                        mumbaiFreightBillResponseDto.setLoadingCharges(extraCharges.getChargesAmount());
+                                    }else if(extraCharges.getChargesHeads().equals("UNLOADING_CHARGES")){
+                                        mumbaiFreightBillResponseDto.setUnloadingCharges(extraCharges.getChargesAmount());
+                                    }else if(extraCharges.getChargesHeads().equals("PLYWOOD_CHARGES")){
+                                        mumbaiFreightBillResponseDto.setPlyWoodCharges(extraCharges.getChargesAmount());
+                                    } else if (extraCharges.getChargesHeads().equals("DETENTION_CHARGES")) {
+                                        mumbaiFreightBillResponseDto.setDetentionCharges(extraCharges.getChargesAmount());
+                                    }
+                                });
+                        mumbaiResponseFreightBillDtos.add(mumbaiFreightBillResponseDto);
 
                     });
 
             MumbaiFreightBillDtoHelper mumbaiFreightBillDtoHelper=new MumbaiFreightBillDtoHelper();
-            mumbaiFreightBillDtoHelper.setMumbaiFreightBillDtos(mumbaiFreightBillDtos);
+            mumbaiFreightBillDtoHelper.setMumbaiFreightBillResponseDtos(mumbaiResponseFreightBillDtos);
 
             LorryReceipt lorryReceipt=lorryReceiptRepository.findByBillNoAndMemoStatusAndRouteName(billNo,routeName).stream().findFirst().get();
+
             if(lorryReceipt.getWhoPay().equals("Consignor")){
                 CommonFreightBillDataDto commonFreightBillDataDto=new CommonFreightBillDataDto();
                 commonFreightBillDataDto.setPartyName(lorryReceipt.getConsignor().getPartyName());
@@ -129,8 +130,12 @@ public class MumbaiFreightBillServiceImpl implements IMumbaiFreightBillService {
     }
 
     @Override
-    public MumbaiBillReport saveMumbaiFreightBill(MumbaiBillReport mumbaiBillReport) {
-        return mumbaiFreightBillRepository.save(mumbaiBillReport);
+    public MumbaiBillReport saveMumbaiFreightBill(MumbaiBillReport mumbaiBillReport) throws BillAlreadySavedException {
+        if(!mumbaiFreightBillRepository.existsByBillNo(mumbaiBillReport.getBillNo())) {
+            return mumbaiFreightBillRepository.save(mumbaiBillReport);
+        }else{
+            throw new BillAlreadySavedException("Bill already saved");
+        }
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.viplogistics.entity.ApiResponse;
 import com.viplogistics.entity.transaction.MumbaiBillReport;
 import com.viplogistics.entity.transaction.NagpurBillReport;
 import com.viplogistics.entity.transaction.NagpurPickupBillReport;
+import com.viplogistics.exception.BillAlreadySavedException;
 import com.viplogistics.service.INagpurPickupFreightBillService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,19 +17,20 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin("*")
 public class NagpurPickupFreightBillController {
 
-    private INagpurPickupFreightBillService nagpurPickupFreightBillService;
+    private final INagpurPickupFreightBillService nagpurPickupFreightBillService;
 
     @GetMapping("/nagpur-pickup-freight")
     public ResponseEntity<?> getNagpurPickupFreightBill(@RequestParam String billNo,@RequestParam String routeName){
         try {
             return ResponseEntity.status(HttpStatus.OK).body(nagpurPickupFreightBillService.getNagpurPickupFreightBill(billNo,routeName));
         }catch (Exception e){
+
             return ResponseEntity.ok(0);
         }
     }
 
     @PostMapping("/save-nagpur-pickup-freight-bill")
-    public ResponseEntity<?> saveNagpurPickupFreightBill(@RequestBody NagpurPickupBillReport nagpurPickupBillReport){
+    public ResponseEntity<?> saveNagpurPickupFreightBill(@RequestBody NagpurPickupBillReport nagpurPickupBillReport) throws BillAlreadySavedException {
         return ResponseEntity.status(HttpStatus.OK).body(nagpurPickupFreightBillService.saveNagpurPickupFreightBill(nagpurPickupBillReport));
     }
 
