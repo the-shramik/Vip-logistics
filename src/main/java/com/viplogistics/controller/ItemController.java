@@ -99,4 +99,9 @@ public class ItemController {
     public ResponseEntity<?> getItemCount(){
         return ResponseEntity.status(HttpStatus.OK).body(itemService.getItemCount());
     }
+
+    @GetMapping("/get-items-by-party-code")
+    public ResponseEntity<?> getItemsByPartyCode(@RequestParam String partyNo){
+       return ResponseEntity.status(HttpStatus.OK).body(itemService.getItemsByPartyCode(partyNo));
+    }
 }

@@ -39,7 +39,7 @@ public class ChakanFreightBillServiceImpl implements IChakanFreightBillService {
 
             List<ChakanExtraCharges> chakanExtraChargesList=new ArrayList<>();
 
-            lorryReceiptRepository.findByBillNoAndMemoStatusAndRouteName(billNo,routeName)
+            lorryReceiptRepository.findByBillNoAndRouteName(billNo,routeName)
                     .forEach(lorryReceipt -> {
 
                         lorryReceipt.getLorryReceiptItems()
@@ -91,7 +91,7 @@ public class ChakanFreightBillServiceImpl implements IChakanFreightBillService {
 
             chakanFreightBillDtoHelper.setChakanExtraCharges(chakanExtraChargesList);
             chakanFreightBillDtoHelper.setChakanFreightBillDtos(chakanFreightBillDtos);
-            LorryReceipt lorryReceipt = lorryReceiptRepository.findByBillNoAndMemoStatusAndRouteName(billNo,routeName).stream().findFirst().get();
+            LorryReceipt lorryReceipt = lorryReceiptRepository.findByBillNoAndRouteName(billNo,routeName).stream().findFirst().get();
 
 
             if (lorryReceipt.getWhoPay().equals("Consignor")) {

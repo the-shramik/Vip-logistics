@@ -46,11 +46,9 @@ public interface ILorryReceiptRepository extends JpaRepository<LorryReceipt,Long
     @Query("SELECT lr FROM lorry_receipt_transaction lr " +
             "WHERE lr.bill.billNo = :billNo " +
             "AND lr.bill IS NOT NULL " +
-            "AND lr.memo.memoStatus = true " +
             "AND lr.route.routeName = :routeName")
-    List<LorryReceipt> findByBillNoAndMemoStatusAndRouteName(@Param("billNo") String billNo,
+    List<LorryReceipt> findByBillNoAndRouteName(@Param("billNo") String billNo,
                                                              @Param("routeName") String routeName);
-
 
     boolean existsByLrNo(String lrNo);
 

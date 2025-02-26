@@ -38,7 +38,7 @@ public class RajkotFreightBillServiceImpl implements IRajkotFreightBillService {
             List<RajkotFreightBillDto> rajkotFreightBillDtos=new ArrayList<>();
 
             List<RajkotExtraCharges> rajkotExtraChargesList=new ArrayList<>();
-            lorryReceiptRepository.findByBillNoAndMemoStatusAndRouteName(billNo,routeName)
+            lorryReceiptRepository.findByBillNoAndRouteName(billNo,routeName)
                     .forEach(lorryReceipt -> {
 
                         lorryReceipt.getLorryReceiptItems()
@@ -100,7 +100,7 @@ public class RajkotFreightBillServiceImpl implements IRajkotFreightBillService {
             rajkotFreightBillDtoHelper.setRajkotExtraCharges(rajkotExtraChargesList);
             rajkotFreightBillDtoHelper.setRajkotFreightBillDtos(rajkotFreightBillDtos);
 
-            LorryReceipt lorryReceipt=lorryReceiptRepository.findByBillNoAndMemoStatusAndRouteName(billNo,routeName).stream().findFirst().get();
+            LorryReceipt lorryReceipt=lorryReceiptRepository.findByBillNoAndRouteName(billNo,routeName).stream().findFirst().get();
 
             if(lorryReceipt.getWhoPay().equals("Consignor")){
                 CommonFreightBillDataDto commonFreightBillDataDto=new CommonFreightBillDataDto();

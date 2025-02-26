@@ -38,7 +38,7 @@ public class NagpurPickupFreightBillServiceImpl implements INagpurPickupFreightB
 
             List<NagpurPickupExtraCharges> nagpurPickupExtraChargesList=new ArrayList<>();
 
-            lorryReceiptRepository.findByBillNoAndMemoStatusAndRouteName(billNo,routeName)
+            lorryReceiptRepository.findByBillNoAndRouteName(billNo,routeName)
                     .forEach(lorryReceipt -> {
 
                         lorryReceipt.getLorryReceiptItems()
@@ -90,7 +90,7 @@ public class NagpurPickupFreightBillServiceImpl implements INagpurPickupFreightB
             nagpurPickupFreightBillDtoHelper.setNagpurPickupExtraCharges(nagpurPickupExtraChargesList);
             nagpurPickupFreightBillDtoHelper.setNagpurPickupFreightBillDtos(nagpurPickupFreightBillDtos);
 
-            LorryReceipt lorryReceipt = lorryReceiptRepository.findByBillNoAndMemoStatusAndRouteName(billNo,routeName).stream().findFirst().get();
+            LorryReceipt lorryReceipt = lorryReceiptRepository.findByBillNoAndRouteName(billNo,routeName).stream().findFirst().get();
 
             System.out.println("Consignor: "+lorryReceipt.getConsignor().getPartyName());
             if (lorryReceipt.getWhoPay().equals("Consignor")) {

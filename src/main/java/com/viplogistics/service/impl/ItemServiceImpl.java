@@ -118,4 +118,9 @@ public class ItemServiceImpl implements IItemService {
 
         return result;
     }
+
+    @Override
+    public List<Item> getItemsByPartyCode(String partyNo) {
+        return itemRepository.findAllByPartyNo(partyNo);
+    }
 }
