@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin("*")
 public class RudrapurFreightBillController {
 
-    private IRudrapurFreightBillService rudrapurFreightBillService;
+    private final IRudrapurFreightBillService rudrapurFreightBillService;
 
     @GetMapping("/rudrapur-freight")
     public ResponseEntity<?> getRudrapurFreightBill(@RequestParam String billNo,@RequestParam String routeName){
@@ -50,5 +50,10 @@ public class RudrapurFreightBillController {
         }else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
+    }
+
+    @GetMapping("/get-rudrapur-freight-bills")
+    public ResponseEntity<?> getAllRudrapurFreightBills(){
+        return ResponseEntity.status(HttpStatus.OK).body(rudrapurFreightBillService.getAllRudrapurFreightBills());
     }
 }

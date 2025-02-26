@@ -33,8 +33,6 @@ public class MumbaiFreightBillDto {
 
     private Double totalFreight;
 
-    private Double stCharges;
-
     private Double subTotal;
 
     private Double cgst;

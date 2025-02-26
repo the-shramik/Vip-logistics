@@ -6,7 +6,7 @@ import com.viplogistics.entity.transaction.NagpurPickupBillReport;
 import com.viplogistics.entity.transaction.dto.CommonFreightBillDataDto;
 import com.viplogistics.entity.transaction.dto.NagpurPickupFreightBillDto;
 import com.viplogistics.entity.transaction.dto.helper.NagpurPickupFreightBillDtoHelper;
-import com.viplogistics.entity.transaction.dto.helper.response.NagpurPickupFreightBillResponseDto;
+import com.viplogistics.entity.transaction.dto.helper.extracharges.NagpurPickupExtraCharges;
 import com.viplogistics.exception.BillAlreadySavedException;
 import com.viplogistics.exception.ResourceNotFoundException;
 import com.viplogistics.repository.ILorryReceiptRepository;
@@ -31,16 +31,16 @@ public class NagpurPickupFreightBillServiceImpl implements INagpurPickupFreightB
     @Override
     public NagpurPickupFreightBillDtoHelper getNagpurPickupFreightBill(String billNo,String routeName) throws ResourceNotFoundException {
         try {
+            NagpurPickupFreightBillDtoHelper nagpurPickupFreightBillDtoHelper = new NagpurPickupFreightBillDtoHelper();
 
-            List<NagpurPickupFreightBillResponseDto> nagpurPickupResponseFreightBillDtos = new ArrayList<>();
+
+            List<NagpurPickupFreightBillDto> nagpurPickupFreightBillDtos=new ArrayList<>();
+
+            List<NagpurPickupExtraCharges> nagpurPickupExtraChargesList=new ArrayList<>();
 
             lorryReceiptRepository.findByBillNoAndMemoStatusAndRouteName(billNo,routeName)
                     .forEach(lorryReceipt -> {
 
-                        NagpurPickupFreightBillResponseDto nagpurPickupFreightBillResponseDto=new NagpurPickupFreightBillResponseDto();
-
-                        List<NagpurPickupFreightBillDto> nagpurPickupFreightBillDtos=new ArrayList<>();
-                        System.out.println("Heree");
                         lorryReceipt.getLorryReceiptItems()
                                 .forEach(lorryReceiptItem -> {
                                     NagpurPickupFreightBillDto nagpurPickupFreightBillDto = new NagpurPickupFreightBillDto();
@@ -56,8 +56,6 @@ public class NagpurPickupFreightBillServiceImpl implements INagpurPickupFreightB
                                     nagpurPickupFreightBillDto.setRate(lorryReceiptItem.getLcvFtl());
                                     nagpurPickupFreightBillDto.setTotalFreight(lorryReceiptItem.getTotalFreight());
                                     nagpurPickupFreightBillDto.setGrandTotal(lorryReceipt.getGrandTotal());
-
-                                    nagpurPickupFreightBillDto.setStCharges(lorryReceipt.getStCharges());
                                     nagpurPickupFreightBillDto.setCgst(null);
                                     nagpurPickupFreightBillDto.setSgst(null);
                                     nagpurPickupFreightBillDto.setTotalBillValue(null);
@@ -66,24 +64,31 @@ public class NagpurPickupFreightBillServiceImpl implements INagpurPickupFreightB
 
                                 });
 
-                        nagpurPickupFreightBillResponseDto.setNagpurPickupFreightBillDtos(nagpurPickupFreightBillDtos);
+                        NagpurPickupExtraCharges nagpurPickupExtraCharges=new NagpurPickupExtraCharges();
+                        nagpurPickupExtraCharges.setLrNo(lorryReceipt.getLrNo());
+                        nagpurPickupExtraCharges.setStCharges(lorryReceipt.getStCharges());
 
                         lorryReceipt.getExtraCharges()
                                 .forEach(extraCharges -> {
                                     if(extraCharges.getChargesHeads().equals("COLLECTION_CHARGES")){
-                                        nagpurPickupFreightBillResponseDto.setCollectionCharges(extraCharges.getChargesAmount());
+                                        nagpurPickupExtraCharges.setCollectionCharges(extraCharges.getChargesAmount());
                                     }else if(extraCharges.getChargesHeads().equals("LOADING_CHARGES")){
-                                        nagpurPickupFreightBillResponseDto.setLoadingCharges(extraCharges.getChargesAmount());
+                                        nagpurPickupExtraCharges.setLoadingCharges(extraCharges.getChargesAmount());
                                     }else if(extraCharges.getChargesHeads().equals("PLYWOOD_CHARGES")){
-                                        nagpurPickupFreightBillResponseDto.setPlyWoodCharges(extraCharges.getChargesAmount());
+                                        nagpurPickupExtraCharges.setPlyWoodCharges(extraCharges.getChargesAmount());
                                     }
                                 });
-                        nagpurPickupResponseFreightBillDtos.add(nagpurPickupFreightBillResponseDto);
 
+                        if(nagpurPickupExtraChargesList.isEmpty()){
+                            nagpurPickupExtraChargesList.add(nagpurPickupExtraCharges);
+                        }
+                        else if(!nagpurPickupExtraChargesList.get(nagpurPickupExtraChargesList.size()-1).getLrNo().equals(lorryReceipt.getLrNo())){
+                            nagpurPickupExtraChargesList.add(nagpurPickupExtraCharges);
+                        }
                     });
 
-            NagpurPickupFreightBillDtoHelper nagpurPickupFreightBillDtoHelper = new NagpurPickupFreightBillDtoHelper();
-            nagpurPickupFreightBillDtoHelper.setNagpurPickupFreightBillResponseDtos(nagpurPickupResponseFreightBillDtos);
+            nagpurPickupFreightBillDtoHelper.setNagpurPickupExtraCharges(nagpurPickupExtraChargesList);
+            nagpurPickupFreightBillDtoHelper.setNagpurPickupFreightBillDtos(nagpurPickupFreightBillDtos);
 
             LorryReceipt lorryReceipt = lorryReceiptRepository.findByBillNoAndMemoStatusAndRouteName(billNo,routeName).stream().findFirst().get();
 
@@ -161,6 +166,11 @@ public class NagpurPickupFreightBillServiceImpl implements INagpurPickupFreightB
         }else{
             return new ApiResponse<>(false,"Report not deleted",null, HttpStatus.NOT_FOUND);
         }
+    }
+
+    @Override
+    public List<NagpurPickupBillReport> getAllNagpurPickupFreightBills() {
+        return nagpurPickupFreightBillRepository.findAll();
     }
 
 

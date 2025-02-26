@@ -16,13 +16,14 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin("*")
 public class ChakanFreightBillController {
 
-    private IChakanFreightBillService chakanFreightBillService;
+    private final IChakanFreightBillService chakanFreightBillService;
 
     @GetMapping("/chakan-freight")
     public ResponseEntity<?> getChakanFreightBill(@RequestParam String billNo,@RequestParam String routeName){
         try{
             return ResponseEntity.status(HttpStatus.OK).body(chakanFreightBillService.getChakanFreightBill(billNo,routeName));
         }catch (Exception e){
+            System.out.println(e);
             return ResponseEntity.ok(0);
         }
     }
@@ -50,5 +51,10 @@ public class ChakanFreightBillController {
         }else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
+    }
+
+    @GetMapping("/get-chakan-freight-bills")
+    public ResponseEntity<?> getAllChakanFreightBills(){
+          return ResponseEntity.status(HttpStatus.OK).body(chakanFreightBillService.getAllChakanFreightBills());
     }
 }

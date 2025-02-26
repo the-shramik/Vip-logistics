@@ -1,16 +1,14 @@
-package com.viplogistics.entity.transaction.dto.helper.response;
+package com.viplogistics.entity.transaction.dto.helper.extracharges;
 
-import com.viplogistics.entity.transaction.dto.NagpurFreightBillDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class NagpurFreightBillResponseDto {
+public class NagpurExtraCharges {
+    private String lrNo;
 
     private Double unloadingCharges;
 
@@ -20,5 +18,5 @@ public class NagpurFreightBillResponseDto {
 
     private Double lrCharges;
 
-    private List<NagpurFreightBillDto> nagpurFreightBillDtos;
+    private Double stCharges;
 }

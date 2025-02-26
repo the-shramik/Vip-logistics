@@ -35,9 +35,6 @@ public class RajkotFreightBillDto {
 
     private Double totalFreight;
 
-
-    private Double stCharges;
-
     private Double subTotal;
 
     private Double igst;

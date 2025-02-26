@@ -29,8 +29,6 @@ public class NagpurPickupFreightBillDto {
 
     private Double totalFreight;
 
-    private Double stCharges;
-
     private Double cgst;
 
     private Double sgst;

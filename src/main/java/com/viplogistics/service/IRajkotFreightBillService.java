@@ -8,6 +8,8 @@ import com.viplogistics.entity.transaction.dto.helper.RajkotFreightBillDtoHelper
 import com.viplogistics.exception.BillAlreadySavedException;
 import com.viplogistics.exception.ResourceNotFoundException;
 
+import java.util.List;
+
 public interface IRajkotFreightBillService {
 
     RajkotFreightBillDtoHelper getRajkotFreightBill(String billNo,String routeName) throws ResourceNotFoundException;
@@ -17,4 +19,5 @@ public interface IRajkotFreightBillService {
     RajkotBillReport updateRajkotFreightBill(RajkotBillReport rajkotBillReport) throws ResourceNotFoundException;
     ApiResponse<?> deleteRajkotFreightBill(Long freightBillReportId);
 
+    List<RajkotBillReport> getAllRajkotFreightBills();
 }

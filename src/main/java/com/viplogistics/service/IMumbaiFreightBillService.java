@@ -7,6 +7,8 @@ import com.viplogistics.entity.transaction.dto.helper.MumbaiFreightBillDtoHelper
 import com.viplogistics.exception.BillAlreadySavedException;
 import com.viplogistics.exception.ResourceNotFoundException;
 
+import java.util.List;
+
 public interface IMumbaiFreightBillService {
     MumbaiFreightBillDtoHelper getMumbaiFreightBill(String billNo,String routeName) throws ResourceNotFoundException;
 
@@ -14,5 +16,7 @@ public interface IMumbaiFreightBillService {
 
     MumbaiBillReport updateMumbaiFreightBill(MumbaiBillReport mumbaiBillReport) throws ResourceNotFoundException;
     ApiResponse<?> deleteMumbaiFreightBill(Long freightBillReportId);
+
+    List<MumbaiBillReport> getAllMumbaiFreightBills();
 
 }

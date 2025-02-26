@@ -6,7 +6,7 @@ import com.viplogistics.entity.transaction.LorryReceipt;
 import com.viplogistics.entity.transaction.dto.ChakanFreightBillDto;
 import com.viplogistics.entity.transaction.dto.CommonFreightBillDataDto;
 import com.viplogistics.entity.transaction.dto.helper.ChakanFreightBillDtoHelper;
-import com.viplogistics.entity.transaction.dto.helper.response.ChakanFreightBillResponseDto;
+import com.viplogistics.entity.transaction.dto.helper.extracharges.ChakanExtraCharges;
 import com.viplogistics.exception.BillAlreadySavedException;
 import com.viplogistics.exception.ResourceNotFoundException;
 import com.viplogistics.repository.IChakanFreightBillRepository;
@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.security.sasl.SaslServer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,15 +33,15 @@ public class ChakanFreightBillServiceImpl implements IChakanFreightBillService {
     public ChakanFreightBillDtoHelper getChakanFreightBill(String billNo,String routeName) throws ResourceNotFoundException {
 
         try {
+            ChakanFreightBillDtoHelper chakanFreightBillDtoHelper = new ChakanFreightBillDtoHelper();
 
-            List<ChakanFreightBillResponseDto> chakanResponseFreightBillDtos = new ArrayList<>();
+            List<ChakanFreightBillDto> chakanFreightBillDtos=new ArrayList<>();
+
+            List<ChakanExtraCharges> chakanExtraChargesList=new ArrayList<>();
 
             lorryReceiptRepository.findByBillNoAndMemoStatusAndRouteName(billNo,routeName)
                     .forEach(lorryReceipt -> {
 
-                        ChakanFreightBillResponseDto chakanFreightBillResponseDto=new ChakanFreightBillResponseDto();
-
-                        List<ChakanFreightBillDto> chakanFreightBillDtos=new ArrayList<>();
                         lorryReceipt.getLorryReceiptItems()
                                 .forEach(lorryReceiptItem -> {
                                     ChakanFreightBillDto chakanFreightBillDto = new ChakanFreightBillDto();
@@ -67,24 +68,31 @@ public class ChakanFreightBillServiceImpl implements IChakanFreightBillService {
 
                                     chakanFreightBillDtos.add(chakanFreightBillDto);
                                 });
-                        chakanFreightBillResponseDto.setChakanFreightBillDtos(chakanFreightBillDtos);
-                        lorryReceipt.getExtraCharges()
-                                .forEach(charge -> {
-                                    if(charge.getChargesHeads().equals("UNLOADING_CHARGES")){
-                                        chakanFreightBillResponseDto.setUnloadingCharges(charge.getChargesAmount());
-                                    }else if(charge.getChargesHeads().equals("LR_CHARGES")){
-                                        chakanFreightBillResponseDto.setLrCharges(charge.getChargesAmount());
-                                    }
-                                });
 
-                        chakanResponseFreightBillDtos.add(chakanFreightBillResponseDto);
+                        ChakanExtraCharges chakanExtraCharges=new ChakanExtraCharges();
+                        chakanExtraCharges.setLrNo(lorryReceipt.getLrNo());
+
+                        lorryReceipt.getExtraCharges().forEach(extraCharges -> {
+                            if(extraCharges.getChargesHeads().equals("LR_CHARGES")){
+                                chakanExtraCharges.setLrCharges(extraCharges.getChargesAmount());
+                            }else if(extraCharges.getChargesHeads().equals("UNLOADING_CHARGES")){
+                                chakanExtraCharges.setUnloadingCharges(extraCharges.getChargesAmount());
+                            }
+                        });
+
+                        if(chakanExtraChargesList.isEmpty()){
+                            chakanExtraChargesList.add(chakanExtraCharges);
+                        }
+                        else if(!chakanExtraChargesList.get(chakanExtraChargesList.size()-1).getLrNo().equals(lorryReceipt.getLrNo())){
+                            chakanExtraChargesList.add(chakanExtraCharges);
+                        }
+
                     });
+
+            chakanFreightBillDtoHelper.setChakanExtraCharges(chakanExtraChargesList);
+            chakanFreightBillDtoHelper.setChakanFreightBillDtos(chakanFreightBillDtos);
             LorryReceipt lorryReceipt = lorryReceiptRepository.findByBillNoAndMemoStatusAndRouteName(billNo,routeName).stream().findFirst().get();
 
-
-//            Common details
-            ChakanFreightBillDtoHelper chakanFreightBillDtoHelper = new ChakanFreightBillDtoHelper();
-            chakanFreightBillDtoHelper.setChakanFreightBillResponseDtos(chakanResponseFreightBillDtos);
 
             if (lorryReceipt.getWhoPay().equals("Consignor")) {
                 CommonFreightBillDataDto commonFreightBillDataDto = new CommonFreightBillDataDto();
@@ -158,6 +166,11 @@ public class ChakanFreightBillServiceImpl implements IChakanFreightBillService {
         }else{
             return new ApiResponse<>(false,"Report not deleted",null, HttpStatus.NOT_FOUND);
         }
+    }
+
+    @Override
+    public List<ChakanBillReport> getAllChakanFreightBills() {
+        return chakanFreightBillRepository.findAll();
     }
 
 

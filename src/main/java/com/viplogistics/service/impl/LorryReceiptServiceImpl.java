@@ -262,10 +262,9 @@ public class LorryReceiptServiceImpl implements ILorryReceiptService {
     @Override
     public ApiResponse<?> updateBillDetails(Bill bill, String lrNo, String lrDate) throws BillAlreadySavedException {
 
-        Optional<LorryReceipt> optionalLr = lorryReceiptRepository.findByBill_BillNo(bill.getBillNo())
-                .stream().findFirst();
+        boolean billAssignedToMemo = memoRepository.isBillAssignedToMemo(bill.getBillNo());
 
-        if(optionalLr.isEmpty()) {
+        if(!billAssignedToMemo) {
             try {
 
                 Bill savedBill = billRepository.save(bill);
@@ -282,7 +281,7 @@ public class LorryReceiptServiceImpl implements ILorryReceiptService {
                 return new ApiResponse<>(false, "Bill not updated", null, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }else {
-            throw new BillAlreadySavedException("Bill already assigned");
+            throw new BillAlreadySavedException("Bill already assigned to memo");
         }
     }
 

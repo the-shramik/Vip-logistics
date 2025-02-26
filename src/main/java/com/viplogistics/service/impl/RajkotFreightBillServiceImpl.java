@@ -6,7 +6,7 @@ import com.viplogistics.entity.transaction.RajkotBillReport;
 import com.viplogistics.entity.transaction.dto.CommonFreightBillDataDto;
 import com.viplogistics.entity.transaction.dto.RajkotFreightBillDto;
 import com.viplogistics.entity.transaction.dto.helper.RajkotFreightBillDtoHelper;
-import com.viplogistics.entity.transaction.dto.helper.response.RajkotFreightBillResponseDto;
+import com.viplogistics.entity.transaction.dto.helper.extracharges.RajkotExtraCharges;
 import com.viplogistics.entity.transaction.helper.ExtraCharges;
 import com.viplogistics.exception.BillAlreadySavedException;
 import com.viplogistics.exception.ResourceNotFoundException;
@@ -33,13 +33,14 @@ public class RajkotFreightBillServiceImpl implements IRajkotFreightBillService {
     public RajkotFreightBillDtoHelper getRajkotFreightBill(String billNo,String routeName) throws ResourceNotFoundException {
 
         try {
-            List<RajkotFreightBillResponseDto> rajkotResponseFreightBillDtos = new ArrayList<>();
+            RajkotFreightBillDtoHelper rajkotFreightBillDtoHelper=new RajkotFreightBillDtoHelper();
+
+            List<RajkotFreightBillDto> rajkotFreightBillDtos=new ArrayList<>();
+
+            List<RajkotExtraCharges> rajkotExtraChargesList=new ArrayList<>();
             lorryReceiptRepository.findByBillNoAndMemoStatusAndRouteName(billNo,routeName)
                     .forEach(lorryReceipt -> {
 
-                        RajkotFreightBillResponseDto rajkotFreightBillResponseDto=new RajkotFreightBillResponseDto();
-
-                        List<RajkotFreightBillDto> rajkotFreightBillDtos=new ArrayList<>();
                         lorryReceipt.getLorryReceiptItems()
                                 .forEach(lorryReceiptItem -> {
                                     RajkotFreightBillDto rajkotFreightBillDto=new RajkotFreightBillDto();
@@ -59,8 +60,6 @@ public class RajkotFreightBillServiceImpl implements IRajkotFreightBillService {
                                     rajkotFreightBillDto.setTotalFreight(lorryReceiptItem.getTotalFreight());
                                     rajkotFreightBillDto.setGrandTotal(lorryReceipt.getGrandTotal());
 
-                                    rajkotFreightBillDto.setStCharges(lorryReceipt.getStCharges());
-
                                     double totalExtraCharges = lorryReceipt.getExtraCharges().stream()
                                             .mapToDouble(ExtraCharges::getChargesAmount)
                                             .sum();
@@ -75,25 +74,31 @@ public class RajkotFreightBillServiceImpl implements IRajkotFreightBillService {
 
                                     rajkotFreightBillDtos.add(rajkotFreightBillDto);
                                 });
-                        rajkotFreightBillResponseDto.setRajkotFreightBillDtos(rajkotFreightBillDtos);
-
+                        RajkotExtraCharges rajkotExtraCharges =new RajkotExtraCharges();
+                        rajkotExtraCharges.setLrNo(lorryReceipt.getLrNo());
+                        rajkotExtraCharges.setStCharges(lorryReceipt.getStCharges());
                         lorryReceipt.getExtraCharges().forEach(extraCharges -> {
                             if(extraCharges.getChargesHeads().equals("DETENTION_CHARGES")){
-                                rajkotFreightBillResponseDto.setDetentionCharges(extraCharges.getChargesAmount());
+                                rajkotExtraCharges.setDetentionCharges(extraCharges.getChargesAmount());
                             }else if(extraCharges.getChargesHeads().equals("LOADING_CHARGES")){
-                                rajkotFreightBillResponseDto.setLoadingCharges(extraCharges.getChargesAmount());
+                                rajkotExtraCharges.setLoadingCharges(extraCharges.getChargesAmount());
                             }else if(extraCharges.getChargesHeads().equals("PLYWOOD_CHARGES")){
-                                rajkotFreightBillResponseDto.setPlyWoodCharges(extraCharges.getChargesAmount());
+                                rajkotExtraCharges.setPlyWoodCharges(extraCharges.getChargesAmount());
                             }else if(extraCharges.getChargesHeads().equals("UNLOADING_CHARGES")){
-                                rajkotFreightBillResponseDto.setUnloadingCharges(extraCharges.getChargesAmount());
+                                rajkotExtraCharges.setUnloadingCharges(extraCharges.getChargesAmount());
+                            }
+
+                            if(rajkotExtraChargesList.isEmpty()){
+                                rajkotExtraChargesList.add(rajkotExtraCharges);
+                            }
+                            else if(!rajkotExtraChargesList.get(rajkotExtraChargesList.size()-1).getLrNo().equals(lorryReceipt.getLrNo())){
+                                rajkotExtraChargesList.add(rajkotExtraCharges);
                             }
                         });
-
-                        rajkotResponseFreightBillDtos.add(rajkotFreightBillResponseDto);
                     });
 
-            RajkotFreightBillDtoHelper rajkotFreightBillDtoHelper=new RajkotFreightBillDtoHelper();
-            rajkotFreightBillDtoHelper.setRajkotFreightBillResponseDtos(rajkotResponseFreightBillDtos);
+            rajkotFreightBillDtoHelper.setRajkotExtraCharges(rajkotExtraChargesList);
+            rajkotFreightBillDtoHelper.setRajkotFreightBillDtos(rajkotFreightBillDtos);
 
             LorryReceipt lorryReceipt=lorryReceiptRepository.findByBillNoAndMemoStatusAndRouteName(billNo,routeName).stream().findFirst().get();
 
@@ -170,5 +175,10 @@ public class RajkotFreightBillServiceImpl implements IRajkotFreightBillService {
         }else{
             return new ApiResponse<>(false,"Report not deleted",null, HttpStatus.NOT_FOUND);
         }
+    }
+
+    @Override
+    public List<RajkotBillReport> getAllRajkotFreightBills() {
+        return rajkotFreightBillRepository.findAll();
     }
 }

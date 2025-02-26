@@ -31,8 +31,6 @@ public class RudrapurFreightBillDto {
 
     private Double totalFreight;
 
-    private Double stCharges;
-
     private Double taxableAmt;
 
     private Double igst;

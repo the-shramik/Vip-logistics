@@ -53,4 +53,9 @@ public class RajkotFreightBillController {
         }
     }
 
+    @GetMapping("/get-rajkot-freight-bills")
+    public ResponseEntity<?> getAllNagpurPickupFreightBills(){
+        return ResponseEntity.status(HttpStatus.OK).body(rajkotFreightBillService.getAllRajkotFreightBills());
+    }
+
 }

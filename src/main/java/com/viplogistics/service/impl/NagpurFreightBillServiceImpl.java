@@ -6,7 +6,7 @@ import com.viplogistics.entity.transaction.NagpurBillReport;
 import com.viplogistics.entity.transaction.dto.CommonFreightBillDataDto;
 import com.viplogistics.entity.transaction.dto.NagpurFreightBillDto;
 import com.viplogistics.entity.transaction.dto.helper.NagpurFreightBillDtoHelper;
-import com.viplogistics.entity.transaction.dto.helper.response.NagpurFreightBillResponseDto;
+import com.viplogistics.entity.transaction.dto.helper.extracharges.NagpurExtraCharges;
 import com.viplogistics.exception.BillAlreadySavedException;
 import com.viplogistics.exception.ResourceNotFoundException;
 import com.viplogistics.repository.ILorryReceiptRepository;
@@ -31,12 +31,14 @@ public class NagpurFreightBillServiceImpl implements INagpurFreightBillService {
     @Override
     public NagpurFreightBillDtoHelper getNagpurFreightBill(String billNo,String routeName) throws ResourceNotFoundException {
         try{
-            List<NagpurFreightBillResponseDto> nagpurResponseFreightBillDtos = new ArrayList<>();
+            NagpurFreightBillDtoHelper nagpurFreightBillDtoHelper=new NagpurFreightBillDtoHelper();
+
+            List<NagpurFreightBillDto> nagpurFreightBillDtos=new ArrayList<>();
+
+            List<NagpurExtraCharges> nagpurExtraChargesList=new ArrayList<>();
 
             lorryReceiptRepository.findByBillNoAndMemoStatusAndRouteName(billNo,routeName)
                     .forEach(lorryReceipt -> {
-                        NagpurFreightBillResponseDto nagpurFreightBillResponseDto=new NagpurFreightBillResponseDto();
-                        List<NagpurFreightBillDto> nagpurFreightBillDtos=new ArrayList<>();
 
                         lorryReceipt.getLorryReceiptItems()
                                 .forEach(lorryReceiptItem -> {
@@ -53,7 +55,6 @@ public class NagpurFreightBillServiceImpl implements INagpurFreightBillService {
                                     nagpurFreightBillDto.setRate(lorryReceiptItem.getLcvFtl());
                                     nagpurFreightBillDto.setTotalFreight(lorryReceiptItem.getTotalFreight());
                                     nagpurFreightBillDto.setGrandTotal(lorryReceipt.getGrandTotal());
-                                    nagpurFreightBillDto.setStCharges(lorryReceipt.getStCharges());
 
                                     nagpurFreightBillDto.setCgst(null);
                                     nagpurFreightBillDto.setSgst(null);
@@ -63,24 +64,30 @@ public class NagpurFreightBillServiceImpl implements INagpurFreightBillService {
 
                                 });
 
-                        nagpurFreightBillResponseDto.setNagpurFreightBillDtos(nagpurFreightBillDtos);
+                        NagpurExtraCharges nagpurExtraCharges=new NagpurExtraCharges();
+                        nagpurExtraCharges.setLrNo(lorryReceipt.getLrNo());
+                        nagpurExtraCharges.setStCharges(lorryReceipt.getStCharges());
                         lorryReceipt.getExtraCharges().forEach(extraCharges -> {
                             if(extraCharges.getChargesHeads().equals("COLLECTION_CHARGES")){
-                                nagpurFreightBillResponseDto.setCollectionCharges(extraCharges.getChargesAmount());
+                                nagpurExtraCharges.setCollectionCharges(extraCharges.getChargesAmount());
                             }else if(extraCharges.getChargesHeads().equals("UNLOADING_CHARGES")){
-                                nagpurFreightBillResponseDto.setUnloadingCharges(extraCharges.getChargesAmount());
+                                nagpurExtraCharges.setUnloadingCharges(extraCharges.getChargesAmount());
                             }else if(extraCharges.getChargesHeads().equals("PLYWOOD_CHARGES")){
-                                nagpurFreightBillResponseDto.setPlyWoodCharges(extraCharges.getChargesAmount());
+                                nagpurExtraCharges.setPlyWoodCharges(extraCharges.getChargesAmount());
                             }else if(extraCharges.getChargesHeads().equals("LR_CHARGES")){
-                                nagpurFreightBillResponseDto.setLrCharges(extraCharges.getChargesAmount());
+                                nagpurExtraCharges.setLrCharges(extraCharges.getChargesAmount());
                             }
                         });
 
-                        nagpurResponseFreightBillDtos.add(nagpurFreightBillResponseDto);
+                        if(nagpurExtraChargesList.isEmpty()){
+                            nagpurExtraChargesList.add(nagpurExtraCharges);
+                        }
+                        else if(!nagpurExtraChargesList.get(nagpurExtraChargesList.size()-1).getLrNo().equals(lorryReceipt.getLrNo())){
+                            nagpurExtraChargesList.add(nagpurExtraCharges);
+                        }
                     });
-
-            NagpurFreightBillDtoHelper nagpurFreightBillDtoHelper=new NagpurFreightBillDtoHelper();
-            nagpurFreightBillDtoHelper.setNagpurFreightBillResponseDtos(nagpurResponseFreightBillDtos);
+            nagpurFreightBillDtoHelper.setNagpurExtraCharges(nagpurExtraChargesList);
+            nagpurFreightBillDtoHelper.setNagpurFreightBillDtos(nagpurFreightBillDtos);
 
             LorryReceipt lorryReceipt=lorryReceiptRepository.findByBillNoAndMemoStatusAndRouteName(billNo,routeName).stream().findFirst().get();
 
@@ -155,6 +162,11 @@ public class NagpurFreightBillServiceImpl implements INagpurFreightBillService {
         }else{
             return new ApiResponse<>(false,"Report not deleted",null, HttpStatus.NOT_FOUND);
         }
+    }
+
+    @Override
+    public List<NagpurBillReport> getAllNagpurFreightBills() {
+        return nagpurFreightBillRepository.findAll();
     }
 
 

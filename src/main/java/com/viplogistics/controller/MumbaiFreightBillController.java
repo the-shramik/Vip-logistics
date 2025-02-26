@@ -51,4 +51,10 @@ public class MumbaiFreightBillController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
     }
+
+    @GetMapping("/get-mumbai-freight-bills")
+    public ResponseEntity<?> getAllMumbaiFreightBills(){
+        return ResponseEntity.status(HttpStatus.OK).body(mumbaiFreightBillService.getAllMumbaiFreightBills());
+    }
+
 }
