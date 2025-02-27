@@ -20,4 +20,9 @@ public interface IRudrapurFreightBillService {
     ApiResponse<?> deleteRudrapurFreightBill(Long freightBillReportId);
 
     List<RudrapurBillReport> getAllRudrapurFreightBills();
+
+    RudrapurBillReport getRudrapurFreightByBillNo(String billNo) throws ResourceNotFoundException;
+
+    List<RudrapurBillReport> getAllRudrapurRequestedFreightBills();
+
 }

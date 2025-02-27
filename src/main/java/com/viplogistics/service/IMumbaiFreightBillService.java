@@ -6,6 +6,7 @@ import com.viplogistics.entity.transaction.MumbaiBillReport;
 import com.viplogistics.entity.transaction.dto.helper.MumbaiFreightBillDtoHelper;
 import com.viplogistics.exception.BillAlreadySavedException;
 import com.viplogistics.exception.ResourceNotFoundException;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -18,5 +19,9 @@ public interface IMumbaiFreightBillService {
     ApiResponse<?> deleteMumbaiFreightBill(Long freightBillReportId);
 
     List<MumbaiBillReport> getAllMumbaiFreightBills();
+
+    MumbaiBillReport getMumbaiFreightByBillNo(String billNo) throws ResourceNotFoundException;
+
+    List<MumbaiBillReport> getAllMumbaiRequestedFreightBills();
 
 }

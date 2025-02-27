@@ -57,4 +57,18 @@ public class ChakanFreightBillController {
     public ResponseEntity<?> getAllChakanFreightBills(){
           return ResponseEntity.status(HttpStatus.OK).body(chakanFreightBillService.getAllChakanFreightBills());
     }
+
+    @GetMapping("/get-chakan-freight-by-bill-no")
+    public ResponseEntity<?> getChakanFreightByBillNo(@RequestParam String billNo){
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(chakanFreightBillService.getChakanFreightByBillNo(billNo));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.OK).body(false);
+        }
+    }
+
+    @GetMapping("/get-chakan-requested-freight-bills")
+    public ResponseEntity<?> getAllChakanRequestedFreightBills(){
+        return ResponseEntity.status(HttpStatus.OK).body(chakanFreightBillService.getAllChakanRequestedFreightBills());
+    }
 }

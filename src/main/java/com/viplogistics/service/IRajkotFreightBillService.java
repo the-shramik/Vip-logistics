@@ -20,4 +20,9 @@ public interface IRajkotFreightBillService {
     ApiResponse<?> deleteRajkotFreightBill(Long freightBillReportId);
 
     List<RajkotBillReport> getAllRajkotFreightBills();
+
+    RajkotBillReport getRajkotFreightByBillNo(String billNo) throws ResourceNotFoundException;
+
+    List<RajkotBillReport> getAllRajkotRequestedFreightBills();
+
 }

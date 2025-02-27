@@ -2,6 +2,7 @@ package com.viplogistics.service.impl;
 
 import com.viplogistics.entity.ApiResponse;
 import com.viplogistics.entity.transaction.LorryReceipt;
+import com.viplogistics.entity.transaction.NagpurBillReport;
 import com.viplogistics.entity.transaction.NagpurPickupBillReport;
 import com.viplogistics.entity.transaction.dto.CommonFreightBillDataDto;
 import com.viplogistics.entity.transaction.dto.NagpurPickupFreightBillDto;
@@ -151,6 +152,8 @@ public class NagpurPickupFreightBillServiceImpl implements INagpurPickupFreightB
         existedNagpurPickupBillReport.setGstNo(nagpurPickupBillReport.getGstNo());
         existedNagpurPickupBillReport.setRouteName(nagpurPickupBillReport.getRouteName());
         existedNagpurPickupBillReport.setTelephoneNo(nagpurPickupBillReport.getTelephoneNo());
+        existedNagpurPickupBillReport.setRequestedBy(nagpurPickupBillReport.getRequestedBy());
+        existedNagpurPickupBillReport.setBillDate(nagpurPickupBillReport.getBillDate());
 
         return nagpurPickupFreightBillRepository.save(existedNagpurPickupBillReport);
 
@@ -173,5 +176,14 @@ public class NagpurPickupFreightBillServiceImpl implements INagpurPickupFreightB
         return nagpurPickupFreightBillRepository.findAll();
     }
 
+    @Override
+    public NagpurPickupBillReport getNagpurPickupFreightByBillNo(String billNo) throws ResourceNotFoundException {
+        return nagpurPickupFreightBillRepository.findByBillNo(billNo)
+                .orElseThrow(()->new ResourceNotFoundException("Freight not found"));
+    }
 
+    @Override
+    public List<NagpurPickupBillReport> getAllNagpurPickupRequestedFreightBills() {
+        return nagpurPickupFreightBillRepository.findByIsVerifiedFalse();
+    }
 }

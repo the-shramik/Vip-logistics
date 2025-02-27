@@ -21,4 +21,8 @@ public interface INagpurFreightBillService {
 
     List<NagpurBillReport> getAllNagpurFreightBills();
 
+    NagpurBillReport getNagpurFreightByBillNo(String billNo) throws ResourceNotFoundException;
+
+    List<NagpurBillReport> getAllNagpurRequestedFreightBills();
+
 }

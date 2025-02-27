@@ -19,4 +19,9 @@ public interface INagpurPickupFreightBillService {
     ApiResponse<?> deleteNagpurPickupFreightBill(Long freightBillReportId);
 
     List<NagpurPickupBillReport> getAllNagpurPickupFreightBills();
+
+    NagpurPickupBillReport getNagpurPickupFreightByBillNo(String billNo) throws ResourceNotFoundException;
+
+    List<NagpurPickupBillReport> getAllNagpurPickupRequestedFreightBills();
+
 }

@@ -2,6 +2,7 @@ package com.viplogistics.service.impl;
 
 import com.viplogistics.entity.ApiResponse;
 import com.viplogistics.entity.transaction.LorryReceipt;
+import com.viplogistics.entity.transaction.NagpurPickupBillReport;
 import com.viplogistics.entity.transaction.RajkotBillReport;
 import com.viplogistics.entity.transaction.dto.CommonFreightBillDataDto;
 import com.viplogistics.entity.transaction.dto.RajkotFreightBillDto;
@@ -160,6 +161,8 @@ public class RajkotFreightBillServiceImpl implements IRajkotFreightBillService {
         existedRajkotBillReport.setGstNo(rajkotBillReport.getGstNo());
         existedRajkotBillReport.setRouteName(rajkotBillReport.getRouteName());
         existedRajkotBillReport.setTelephoneNo(rajkotBillReport.getTelephoneNo());
+        existedRajkotBillReport.setRequestedBy(rajkotBillReport.getRequestedBy());
+        existedRajkotBillReport.setBillDate(rajkotBillReport.getBillDate());
 
         return rajkotFreightBillRepository.save(existedRajkotBillReport);
 
@@ -181,4 +184,16 @@ public class RajkotFreightBillServiceImpl implements IRajkotFreightBillService {
     public List<RajkotBillReport> getAllRajkotFreightBills() {
         return rajkotFreightBillRepository.findAll();
     }
+
+    @Override
+    public RajkotBillReport getRajkotFreightByBillNo(String billNo) throws ResourceNotFoundException {
+        return rajkotFreightBillRepository.findByBillNo(billNo)
+                .orElseThrow(()->new ResourceNotFoundException("Freight not found"));
+    }
+
+    @Override
+    public List<RajkotBillReport> getAllRajkotRequestedFreightBills() {
+        return rajkotFreightBillRepository.findByIsVerifiedFalse();
+    }
+
 }

@@ -2,6 +2,7 @@ package com.viplogistics.service;
 
 import com.viplogistics.entity.ApiResponse;
 import com.viplogistics.entity.transaction.ChakanBillReport;
+import com.viplogistics.entity.transaction.MumbaiBillReport;
 import com.viplogistics.entity.transaction.dto.helper.ChakanFreightBillDtoHelper;
 import com.viplogistics.exception.BillAlreadySavedException;
 import com.viplogistics.exception.ResourceNotFoundException;
@@ -19,4 +20,8 @@ public interface IChakanFreightBillService {
     ApiResponse<?> deleteChakanFreightBill(Long freightBillReportId);
 
     List<ChakanBillReport> getAllChakanFreightBills();
+
+    ChakanBillReport getChakanFreightByBillNo(String billNo) throws ResourceNotFoundException;
+
+    List<ChakanBillReport> getAllChakanRequestedFreightBills();
 }

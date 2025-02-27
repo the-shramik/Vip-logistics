@@ -2,6 +2,7 @@ package com.viplogistics.service.impl;
 
 import com.viplogistics.entity.ApiResponse;
 import com.viplogistics.entity.transaction.LorryReceipt;
+import com.viplogistics.entity.transaction.RajkotBillReport;
 import com.viplogistics.entity.transaction.RudrapurBillReport;
 import com.viplogistics.entity.transaction.dto.CommonFreightBillDataDto;
 import com.viplogistics.entity.transaction.dto.RudrapurFreightBillDto;
@@ -149,6 +150,8 @@ public class RudrapurFreightBillServiceImpl implements IRudrapurFreightBillServi
         existedRudrapurBillReport.setGstNo(rudrapurBillReport.getGstNo());
         existedRudrapurBillReport.setRouteName(rudrapurBillReport.getRouteName());
         existedRudrapurBillReport.setTelephoneNo(rudrapurBillReport.getTelephoneNo());
+        existedRudrapurBillReport.setRequestedBy(rudrapurBillReport.getRequestedBy());
+        existedRudrapurBillReport.setBillDate(rudrapurBillReport.getBillDate());
 
         return rudrapurFreightBillRepository.save(rudrapurBillReport);
 
@@ -171,4 +174,14 @@ public class RudrapurFreightBillServiceImpl implements IRudrapurFreightBillServi
         return rudrapurFreightBillRepository.findAll();
     }
 
+    @Override
+    public RudrapurBillReport getRudrapurFreightByBillNo(String billNo) throws ResourceNotFoundException {
+        return rudrapurFreightBillRepository.findByBillNo(billNo)
+                .orElseThrow(()->new ResourceNotFoundException("Freight not found"));
+    }
+
+    @Override
+    public List<RudrapurBillReport> getAllRudrapurRequestedFreightBills() {
+        return rudrapurFreightBillRepository.findByIsVerifiedFalse();
+    }
 }

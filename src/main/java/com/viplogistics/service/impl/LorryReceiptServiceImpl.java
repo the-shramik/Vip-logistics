@@ -262,28 +262,39 @@ public class LorryReceiptServiceImpl implements ILorryReceiptService {
     @Override
     public ApiResponse<?> updateBillDetails(Bill bill, String lrNo, String lrDate) throws BillAlreadySavedException {
 
-        boolean billAssignedToMemo = memoRepository.isBillAssignedToMemo(bill.getBillNo());
+        try {
+            Optional<Bill> optionalBill = billRepository.findByBillNo(bill.getBillNo());
+            Bill savedBill = optionalBill.orElseGet(() -> billRepository.save(bill));
 
-        if(!billAssignedToMemo) {
-            try {
+            List<LorryReceipt> lorryReceipts = lorryReceiptRepository.findByLrNoAndLrDate(lrNo, lrDate);
 
-                Bill savedBill = billRepository.save(bill);
-                lorryReceiptRepository.findByLrNoAndLrDate(lrNo, lrDate)
-                        .forEach(lorryReceipt -> {
-
-                            LorryReceipt existedLr = lorryReceiptRepository.findById(lorryReceipt.getLrId()).get();
-                            existedLr.setBill(savedBill);
-                            lorryReceiptRepository.save(existedLr);
-                        });
-
-                return new ApiResponse<>(true, "Bill updated", null, HttpStatus.OK);
-            } catch (Exception e) {
-                return new ApiResponse<>(false, "Bill not updated", null, HttpStatus.INTERNAL_SERVER_ERROR);
+            if (lorryReceipts.isEmpty()) {
+                return new ApiResponse<>(false, "No LorryReceipt found", null, HttpStatus.NOT_FOUND);
             }
-        }else {
-            throw new BillAlreadySavedException("Bill already assigned to memo");
+
+            Memo commonMemo = lorryReceipts.get(0).getMemo();
+
+            Optional<LorryReceipt> conflictingLR = lorryReceiptRepository.findByBill_BillNo(savedBill.getBillNo())
+                    .stream()
+                    .filter(lr -> lr.getMemo() != null && !lr.getMemo().getMemoId().equals(commonMemo.getMemoId()))
+                    .findFirst();
+
+            if (conflictingLR.isPresent()) {
+                throw new BillAlreadySavedException("Bill already assigned to another memo");
+            }
+
+            for (LorryReceipt lr : lorryReceipts) {
+                lr.setBill(savedBill);
+                lorryReceiptRepository.save(lr);
+            }
+
+            return new ApiResponse<>(true, "Bill updated successfully", null, HttpStatus.OK);
+        } catch (Exception e) {
+            System.out.println(e);
+            return new ApiResponse<>(false, "Bill not updated", null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     @Override
     public LorryReceipt getLrByMemoNoLrNo(String lrNo, String memoNo) throws ResourceNotFoundException {

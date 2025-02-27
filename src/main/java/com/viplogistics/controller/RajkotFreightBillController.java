@@ -58,4 +58,18 @@ public class RajkotFreightBillController {
         return ResponseEntity.status(HttpStatus.OK).body(rajkotFreightBillService.getAllRajkotFreightBills());
     }
 
+    @GetMapping("/get-rajkot-freight-by-bill-no")
+    public ResponseEntity<?> getNagpurPickupRajkotFreightByBillNo(@RequestParam String billNo){
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(rajkotFreightBillService.getRajkotFreightByBillNo(billNo));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.OK).body(false);
+        }
+    }
+
+    @GetMapping("/get-rajkot-requested-freight-bills")
+    public ResponseEntity<?> getAllRajkotRequestedFreightBills(){
+        return ResponseEntity.status(HttpStatus.OK).body(rajkotFreightBillService.getAllRajkotRequestedFreightBills());
+    }
+
 }

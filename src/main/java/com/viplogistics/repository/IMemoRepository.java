@@ -16,7 +16,11 @@ public interface IMemoRepository extends JpaRepository<Memo,Long> {
     @Query("SELECT m.memoNo FROM memo_lorry_receipt m ORDER BY m.memoId DESC LIMIT 1")
     String findLastMemoNo();
 
-    @Query("SELECT COUNT(m) > 0 FROM memo_lorry_receipt m JOIN m.lorryReceipts lr WHERE lr.bill.billNo = :billNo")
-    boolean isBillAssignedToMemo(@Param("billNo") String billNo);
+    @Query("SELECT COUNT(m) <= 1 FROM memo_lorry_receipt m WHERE EXISTS " +
+            "(SELECT 1 FROM lorry_receipt_transaction lr WHERE lr.memo = m AND lr.bill.billNo = :billNo)")
+    boolean isBillAssignedToOnlyOneMemo(@Param("billNo") String billNo);
+
+
+
 
 }

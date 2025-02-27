@@ -3,6 +3,7 @@ package com.viplogistics.service.impl;
 import com.viplogistics.entity.ApiResponse;
 import com.viplogistics.entity.transaction.ChakanBillReport;
 import com.viplogistics.entity.transaction.LorryReceipt;
+import com.viplogistics.entity.transaction.MumbaiBillReport;
 import com.viplogistics.entity.transaction.dto.ChakanFreightBillDto;
 import com.viplogistics.entity.transaction.dto.CommonFreightBillDataDto;
 import com.viplogistics.entity.transaction.dto.helper.ChakanFreightBillDtoHelper;
@@ -151,6 +152,8 @@ public class ChakanFreightBillServiceImpl implements IChakanFreightBillService {
         existedChakanBillReport.setGstNo(chakanBillReport.getGstNo());
         existedChakanBillReport.setRouteName(chakanBillReport.getRouteName());
         existedChakanBillReport.setTelephoneNo(chakanBillReport.getTelephoneNo());
+        existedChakanBillReport.setRequestedBy(chakanBillReport.getRequestedBy());
+        existedChakanBillReport.setBillDate(chakanBillReport.getBillDate());
 
         return chakanFreightBillRepository.save(existedChakanBillReport);
 
@@ -173,5 +176,14 @@ public class ChakanFreightBillServiceImpl implements IChakanFreightBillService {
         return chakanFreightBillRepository.findAll();
     }
 
+    @Override
+    public ChakanBillReport getChakanFreightByBillNo(String billNo) throws ResourceNotFoundException {
+        return chakanFreightBillRepository.findByBillNo(billNo)
+                .orElseThrow(()->new ResourceNotFoundException("Freight not found"));
+    }
 
+    @Override
+    public List<ChakanBillReport> getAllChakanRequestedFreightBills() {
+        return chakanFreightBillRepository.findByIsVerifiedFalse();
+    }
 }

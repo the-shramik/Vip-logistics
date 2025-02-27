@@ -56,4 +56,18 @@ public class NagpurFreightBillController {
     public ResponseEntity<?> getAllNagpurFreightBills(){
         return ResponseEntity.status(HttpStatus.OK).body(nagpurFreightBillService.getAllNagpurFreightBills());
     }
+
+    @GetMapping("/get-nagpur-freight-by-bill-no")
+    public ResponseEntity<?> getNagpurFreightByBillNo(@RequestParam String billNo){
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(nagpurFreightBillService.getNagpurFreightByBillNo(billNo));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.OK).body(false);
+        }
+    }
+
+    @GetMapping("/get-nagpur-requested-freight-bills")
+    public ResponseEntity<?> getAllNagpurRequestedFreightBills(){
+        return ResponseEntity.status(HttpStatus.OK).body(nagpurFreightBillService.getAllNagpurRequestedFreightBills());
+    }
 }

@@ -56,4 +56,18 @@ public class RudrapurFreightBillController {
     public ResponseEntity<?> getAllRudrapurFreightBills(){
         return ResponseEntity.status(HttpStatus.OK).body(rudrapurFreightBillService.getAllRudrapurFreightBills());
     }
+
+    @GetMapping("/get-rudrapur-freight-by-bill-no")
+    public ResponseEntity<?> getRudrapurRajkotFreightByBillNo(@RequestParam String billNo){
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(rudrapurFreightBillService.getRudrapurFreightByBillNo(billNo));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.OK).body(false);
+        }
+    }
+
+    @GetMapping("/get-rudrapur-requested-freight-bills")
+    public ResponseEntity<?> getAllRudrapurRequestedFreightBills(){
+        return ResponseEntity.status(HttpStatus.OK).body(rudrapurFreightBillService.getAllRudrapurRequestedFreightBills());
+    }
 }

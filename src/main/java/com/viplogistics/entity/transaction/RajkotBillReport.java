@@ -41,4 +41,8 @@ public class RajkotBillReport {
     private String sac;
 
     private Boolean isVerified;
+
+    private String requestedBy;
+
+    private String billDate;
 }

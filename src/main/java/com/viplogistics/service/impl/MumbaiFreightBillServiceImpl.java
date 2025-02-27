@@ -164,6 +164,8 @@ public class MumbaiFreightBillServiceImpl implements IMumbaiFreightBillService {
         existedMumbaiBillReport.setGstNo(mumbaiBillReport.getGstNo());
         existedMumbaiBillReport.setRouteName(mumbaiBillReport.getRouteName());
         existedMumbaiBillReport.setTelephoneNo(mumbaiBillReport.getTelephoneNo());
+        existedMumbaiBillReport.setRequestedBy(mumbaiBillReport.getRequestedBy());
+        existedMumbaiBillReport.setBillDate(mumbaiBillReport.getBillDate());
 
         return mumbaiFreightBillRepository.save(existedMumbaiBillReport);
 
@@ -184,5 +186,16 @@ public class MumbaiFreightBillServiceImpl implements IMumbaiFreightBillService {
     @Override
     public List<MumbaiBillReport> getAllMumbaiFreightBills() {
         return mumbaiFreightBillRepository.findAll();
+    }
+
+    @Override
+    public MumbaiBillReport getMumbaiFreightByBillNo(String billNo) throws ResourceNotFoundException {
+        return mumbaiFreightBillRepository.findByBillNo(billNo)
+                .orElseThrow(()->new ResourceNotFoundException("Freight not found"));
+    }
+
+    @Override
+    public List<MumbaiBillReport> getAllMumbaiRequestedFreightBills() {
+        return mumbaiFreightBillRepository.findByIsVerifiedFalse();
     }
 }

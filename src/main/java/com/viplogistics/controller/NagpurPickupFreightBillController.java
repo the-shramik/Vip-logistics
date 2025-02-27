@@ -58,4 +58,18 @@ public class NagpurPickupFreightBillController {
     public ResponseEntity<?> getAllNagpurPickupFreightBills(){
         return ResponseEntity.status(HttpStatus.OK).body(nagpurPickupFreightBillService.getAllNagpurPickupFreightBills());
     }
+
+    @GetMapping("/get-nagpur-pick-up-freight-by-bill-no")
+    public ResponseEntity<?> getNagpurPickupFreightByBillNo(@RequestParam String billNo){
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(nagpurPickupFreightBillService.getNagpurPickupFreightByBillNo(billNo));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.OK).body(false);
+        }
+    }
+
+    @GetMapping("/get-nagpur-pickup-requested-freight-bills")
+    public ResponseEntity<?> getAllNagpurPickupRequestedFreightBills(){
+        return ResponseEntity.status(HttpStatus.OK).body(nagpurPickupFreightBillService.getAllNagpurPickupRequestedFreightBills());
+    }
 }
